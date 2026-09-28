@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CSP: 禁止 eval / inline script,用于真实触发 CSP 违规报告 -->
+<meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; base-uri 'none'; img-src 'self' data:;">
+<title>Reporting API 报告聚合中心</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>Reporting API 报告聚合中心</h1>
+  <div id="status-bar" class="chips"></div>
+</header>
+
+<div id="banner-area"></div>
+
+<main>
+  <section class="panel">
+    <h2>端点注册（Report-To）</h2>
+    <div class="row">
+      <label>端点 URL
+        <input id="endpoint-url" type="text" value="local://aggregate" size="28">
+      </label>
+      <label><input id="simulate-endpoint-failure" type="checkbox"> 模拟注册/投递失败</label>
+      <button id="btn-register">注册端点</button>
+      <span id="endpoint-status" class="chip chip-gray">未注册</span>
+    </div>
+    <div class="hint">
+      等效响应头：<code>Report-To: {"group":"default","max_age":86400,"endpoints":[{"url":"&lt;端点&gt;"}]}</code>
+      与 <code>Reporting-Endpoints: default="&lt;端点&gt;"</code>。静态页面无法真实下发响应头，此处以注册流程模拟；
+      <code>local://aggregate</code> 为内置本地聚合端点（注册成功），其他 URL 将真实尝试 POST 投递。
+    </div>
+    <div id="delivery-log" class="log"></div>
+  </section>
+
+  <section class="panel">
+    <h2>报告模拟生成</h2>
+    <div class="row wrap">
+      <button data-sim="csp-eval">CSP 违规（真实 eval 拦截）</button>
+      <button data-sim="csp-resource">CSP 违规（真实外链脚本拦截）</button>
+      <button data-sim="deprecation">弃用警告（模拟）</button>
+      <button data-sim="intervention">干预报告（模拟）</button>
+      <button data-sim="crash">崩溃报告（模拟）</button>
+      <button data-sim="out-of-order">乱序报告 ×6</button>
+      <button data-sim="loss">丢失序列（跳过 seq）</button>
+      <button data-sim="burst">突发 ×600（触发截断）</button>
+    </div>
+    <div class="hint" id="sim-hint"></div>
+  </section>
+
+  <section class="panel">
+    <h2>统计聚合（跨标签页）</h2>
+    <div id="stats-cards" class="stats"></div>
+  </section>
+
+  <section class="panel">
+    <h2>时间线（Canvas）</h2>
+    <div class="row">
+      <label>桶粒度
+        <select id="bucket-size">
+          <option value="1000">1 秒</option>
+          <option value="5000" selected>5 秒</option>
+          <option value="30000">30 秒</option>
+          <option value="60000">1 分钟</option>
+        </select>
+      </label>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="timeline"></canvas>
+      <div id="timeline-tooltip" class="tooltip hidden"></div>
+    </div>
+    <div id="timeline-legend" class="legend"></div>
+  </section>
+
+  <section class="panel">
+    <h2>报告列表</h2>
+    <div class="row wrap filters">
+      <label>类型
+        <select id="filter-type">
+          <option value="">全部</option>
+        </select>
+      </label>
+      <label>来源
+        <select id="filter-source">
+          <option value="">全部</option>
+        </select>
+      </label>
+      <label>标签页
+        <select id="filter-tab">
+          <option value="">全部</option>
+        </select>
+      </label>
+      <label>关键词 <input id="filter-text" type="search" placeholder="搜索正文/URL"></label>
+      <button id="btn-export-json">导出 JSON</button>
+      <button id="btn-export-csv">导出 CSV</button>
+      <button id="btn-clear" class="danger">清空（全部标签页）</button>
+    </div>
+    <div class="hint" id="table-summary"></div>
+    <table id="report-table">
+      <thead>
+        <tr>
+          <th>#</th><th>事件时间</th><th>到达时间</th><th>类型</th><th>来源</th>
+          <th>标签页/seq</th><th>摘要</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+
+<script src="js/db.js"></script>
+<script src="js/bus.js"></script>
+<script src="js/store.js"></script>
+<script src="js/collector.js"></script>
+<script src="js/endpoint.js"></script>
+<script src="js/simulator.js"></script>
+<script src="js/timeline.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
