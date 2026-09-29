@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporting API 监控台</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Reporting API 监控台</h1>
+    <div class="badges">
+      <span class="badge" id="badgeApi" title="浏览器 Reporting API 支持情况">API: 检测中</span>
+      <span class="badge" id="badgeEndpoint" title="report-to 端点注册/健康状态">端点: 检测中</span>
+      <span class="badge" id="badgeMode" title="当前采集模式">模式: -</span>
+      <span class="badge" id="badgeTabs" title="通过 BroadcastChannel 发现的标签页">标签页: 1</span>
+    </div>
+  </header>
+
+  <div id="alerts" class="alerts"></div>
+
+  <main>
+    <section class="panel">
+      <h2>报告模拟</h2>
+      <div class="btn-grid">
+        <button data-sim="csp-violation">模拟 CSP 违规</button>
+        <button data-sim="deprecation">模拟弃用警告</button>
+        <button data-sim="intervention">模拟干预报告</button>
+        <button data-sim="crash">模拟崩溃报告</button>
+        <button data-sim="network-error">模拟网络错误</button>
+        <button data-sim="out-of-order" class="warn">模拟乱序上报</button>
+        <button data-sim="loss" class="warn">模拟报告丢失</button>
+        <button data-sim="burst" class="warn">模拟突发 (550 条)</button>
+        <button data-real="csp" class="real">触发真实 CSP 违规</button>
+        <button data-real="deprecation" class="real">触发真实弃用特性</button>
+        <button id="btnEndpointOutage" class="danger">模拟端点故障</button>
+        <button id="btnEndpointRecover" class="ok" disabled>恢复端点</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>聚合统计</h2>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <section class="panel">
+      <h2>时间线 (Canvas)</h2>
+      <div class="chart-wrap" id="chartWrap">
+        <canvas id="timeline"></canvas>
+        <div class="tooltip" id="tooltip" hidden></div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </section>
+
+    <section class="panel">
+      <h2>报告列表</h2>
+      <div class="toolbar">
+        <select id="filterType" title="按类型过滤">
+          <option value="all">全部类型</option>
+        </select>
+        <select id="filterSource" title="按来源过滤">
+          <option value="all">全部来源</option>
+        </select>
+        <input type="search" id="filterText" placeholder="搜索 URL / 内容...">
+        <span class="spacer"></span>
+        <button id="btnExportJson">导出 JSON</button>
+        <button id="btnExportCsv">导出 CSV</button>
+        <button id="btnClear" class="danger">清空</button>
+      </div>
+      <div class="table-note" id="tableNote"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>事件时间</th><th>接收时间</th><th>类型</th><th>来源</th>
+              <th>状态</th><th>标签页</th><th>Seq</th><th>详情</th>
+            </tr>
+          </thead>
+          <tbody id="reportRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/db.js"></script>
+  <script src="/js/bus.js"></script>
+  <script src="/js/collector.js"></script>
+  <script src="/js/simulator.js"></script>
+  <script src="/js/chart.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
